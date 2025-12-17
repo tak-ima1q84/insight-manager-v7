@@ -1,0 +1,380 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+header {
+  background: #2c3e50;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+header button {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+header button:hover {
+  background: #2980b9;
+}
+
+.login {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.login h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.login input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.login button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.login button:hover {
+  background: #2980b9;
+}
+
+.insight-list, .insight-detail, .master-management {
+  padding: 2rem;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+}
+
+.toolbar button {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background: #2980b9;
+}
+
+table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+thead {
+  background: #34495e;
+  color: white;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 800px;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.form input,
+.form select,
+.form textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.insight-form {
+  padding: 2rem;
+}
+
+.insight-form button[type="submit"] {
+  background: #27ae60;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.insight-form button[type="submit"]:hover {
+  background: #229954;
+}
+
+.search-panel {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-panel h3 {
+  margin-bottom: 1rem;
+}
+
+.search-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.search-form label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.search-form input,
+.search-form select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.search-form button {
+  grid-column: span 1;
+  align-self: end;
+  padding: 0.5rem 1rem;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background: #7f8c8d;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.modal-close:hover {
+  background: #c0392b;
+}
+
+.image-section {
+  margin: 1.5rem 0;
+}
+
+.image-section h3 {
+  margin-bottom: 1rem;
+}
+
+.image-section img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+tbody tr td button {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+tbody tr td button:hover {
+  background: #2980b9;
+}
+
+.checkbox-group {
+  grid-column: span 2;
+  min-width: 300px;
+}
+
+.checkbox-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 4px;
+  min-width: 280px;
+  width: 100%;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.35rem 0;
+  font-weight: normal;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+}
+
+.checkbox-item:hover {
+  background: #f8f9fa;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin: 0;
+  margin-right: 0.6rem;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-item span {
+  line-height: 1.4;
+  width: 85%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Form checkbox containers - wider for insight forms */
+.form-checkbox-container {
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 4px;
+  min-width: 400px;
+  width: 100%;
+}
+
+.form-checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.4rem 0;
+  font-weight: normal;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+}
+
+.form-checkbox-item:hover {
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+.form-checkbox-item input[type="checkbox"] {
+  margin: 0;
+  margin-right: 0.75rem;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.form-checkbox-item span {
+  line-height: 1.4;
+  width: 90%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
