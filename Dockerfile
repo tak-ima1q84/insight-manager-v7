@@ -11,8 +11,10 @@ COPY package.json bun.lock ./
 # Install dependencies (without postinstall)
 RUN bun install --ignore-scripts
 
+
 # Copy source code
 COPY . .
+
 
 # Build frontend explicitly
 RUN bun run build
