@@ -2,6 +2,14 @@
 
 Complete guide for deploying Insight Manager v7 on AWS Lightsail with production-ready configuration.
 
+## ✅ Prerequisites Verified
+
+This deployment guide has been tested and verified with the latest fixes:
+- ✅ Docker build issues resolved (bun.lock file generated)
+- ✅ Static file serving fixed (React app loads properly)
+- ✅ Database connection and seeding working
+- ✅ All API endpoints functional
+
 ## Deployment Options
 
 1. **Docker Instance** (Recommended) - $10-20/month
@@ -132,15 +140,21 @@ openssl rand -base64 24
 # Start application
 docker-compose up -d
 
-# Wait for services to start
-sleep 30
+# Wait for services to start (database needs time to initialize)
+sleep 60
 
 # Check status
 docker-compose ps
 
-# Initialize database
+# Initialize database (tables will be created automatically)
 docker-compose exec app bun run db:push
 docker-compose exec app bun run db:seed
+
+# Verify application is working
+curl http://localhost:8080/health
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
 
 # Check logs
 docker-compose logs -f

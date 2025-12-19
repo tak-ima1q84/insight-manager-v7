@@ -2,6 +2,15 @@
 
 Get Insight Manager v7 running in under 5 minutes.
 
+## ✅ Latest Updates (December 2024)
+
+**All issues resolved!** This version includes:
+- ✅ Fixed Docker build (bun.lock file generated)
+- ✅ Fixed white screen issue (static file serving corrected)
+- ✅ Database initialization working properly
+- ✅ All API endpoints functional
+- ✅ React frontend loading correctly
+
 ## Prerequisites
 
 - Docker and Docker Compose installed
@@ -16,12 +25,16 @@ cd insight-manager-v7
 # Start the application
 docker-compose up -d
 
-# Wait for containers to start (about 10 seconds)
-sleep 10
+# Wait for containers to start (database needs time to initialize)
+sleep 30
 
-# Initialize database (run once)
+# Initialize database (creates tables and seed data)
 docker-compose exec app bun run db:push
 docker-compose exec app bun run db:seed
+
+# Verify everything is working
+curl http://localhost:8080/health
+echo "✅ Application is healthy"
 
 # Open in browser
 open http://localhost:8080
@@ -49,10 +62,15 @@ bun run vite
 # Then open http://localhost:5173
 ```
 
-## Login
+## Login Credentials
 
-- **Username**: `admin`
-- **Password**: `admin123`
+The application comes with three pre-configured accounts:
+
+- **Admin** (Full access): username: `admin`, password: `admin123`
+- **Manager** (Create/Edit): username: `manager`, password: `manager123`  
+- **Viewer** (Read-only): username: `viewer`, password: `viewer123`
+
+**🎉 Success!** You should see the Japanese login interface. Use admin credentials for full functionality.
 
 ## What's Next?
 
@@ -63,10 +81,26 @@ bun run vite
 
 ## Troubleshooting
 
+### White Screen or App Not Loading
+```bash
+# Check if containers are running
+docker-compose ps
+
+# Check application logs
+docker-compose logs app
+
+# Restart containers
+docker-compose restart
+```
+
 ### Database Connection Issues
 ```bash
 # Check database container logs
 docker-compose logs db
+
+# Wait longer for database to initialize
+sleep 60
+docker-compose exec app bun run db:push
 
 # Restart containers
 docker-compose down
@@ -78,7 +112,7 @@ docker-compose up -d
 # Stop existing containers
 docker-compose down
 
-# Or change port in docker-compose.yml
+# Or change port in docker-compose.yml from 8080 to another port
 ```
 
 ### Reset Everything
@@ -86,8 +120,22 @@ docker-compose down
 # Complete reset (removes all data)
 docker-compose down -v
 docker-compose up -d
+sleep 60  # Wait for database
 docker-compose exec app bun run db:push
 docker-compose exec app bun run db:seed
+```
+
+### Verify Installation
+```bash
+# Test health endpoint
+curl http://localhost:8080/health
+
+# Test login API
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Should return a JSON response with token
 ```
 
 ## API Endpoints

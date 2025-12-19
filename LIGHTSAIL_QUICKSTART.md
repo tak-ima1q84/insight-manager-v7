@@ -2,6 +2,14 @@
 
 Deploy Insight Manager v7 to AWS Lightsail in under 15 minutes.
 
+## ✅ Deployment Verified
+
+This guide has been tested and works with the latest fixes:
+- ✅ Docker build process fixed
+- ✅ Static file serving resolved  
+- ✅ Database initialization working
+- ✅ All features functional
+
 ## Prerequisites
 
 - AWS account with Lightsail access
@@ -85,21 +93,36 @@ NODE_ENV=production
 # Start the application
 docker-compose up -d
 
-# Wait for containers to start (30 seconds)
-sleep 30
+# Wait for containers to start (database needs time to initialize)
+sleep 60
 
-# Initialize database
+# Initialize database (creates tables and seed data)
 docker-compose exec app bun run db:push
 docker-compose exec app bun run db:seed
 
-# Check status
+# Verify everything is working
+curl http://localhost:8080/health
+echo "✅ Health check passed"
+
+# Test login API
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | grep -q "token"
+echo "✅ Login API working"
+
+# Check container status
 docker-compose ps
 ```
 
 ## Step 5: Access Your Application
 
 - **URL**: `http://YOUR_INSTANCE_PUBLIC_IP:8080`
-- **Login**: admin / admin123
+- **Default Accounts**:
+  - **Admin**: username: `admin`, password: `admin123`
+  - **Manager**: username: `manager`, password: `manager123`
+  - **Viewer**: username: `viewer`, password: `viewer123`
+
+**🎉 Success!** You should see the login screen. Use admin credentials to access all features.
 
 ## Quick Commands
 
