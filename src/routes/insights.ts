@@ -199,12 +199,18 @@ export const insightRoutes = new Elysia({ prefix: '/api/insights' })
   })
   .post('/import/csv', async ({ body, set }) => {
     try {
-      const formData = body as any;
-      const file = formData.file;
+      // In Elysia, multipart form data is parsed automatically
+      // The file should be available directly in body
+      const file = (body as any).file;
       
       if (!file) {
         set.status = 400;
         return { error: 'No file provided' };
+      }
+      
+      if (typeof file.text !== 'function') {
+        set.status = 400;
+        return { error: 'Invalid file format - file.text is not a function' };
       }
 
       const text = await file.text();
@@ -223,28 +229,41 @@ export const insightRoutes = new Elysia({ prefix: '/api/insights' })
         
         for (let i = 0; i < line.length; i++) {
           const char = line[i];
+          const nextChar = line[i + 1];
           
           if (char === '"') {
-            inQuotes = !inQuotes;
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote
+              current += '"';
+              i++; // Skip next quote
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+            }
           } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
+            result.push(current);
             current = '';
           } else {
             current += char;
           }
         }
-        result.push(current.trim());
+        result.push(current);
         return result;
       };
 
       // Helper function to safely parse JSON
       const safeJSONParse = (str: string, defaultValue: any = []) => {
-        if (!str || str === '""' || str === '') return defaultValue;
+        if (!str || str === '' || str === '""') return defaultValue;
         try {
-          // Remove surrounding quotes if present
-          const cleaned = str.replace(/^"(.*)"$/, '$1');
+          // Handle properly escaped CSV field
+          let cleaned = str;
+          // If wrapped in quotes, remove them and unescape internal quotes
+          if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+            cleaned = cleaned.slice(1, -1).replace(/""/g, '"');
+          }
           return JSON.parse(cleaned);
-        } catch {
+        } catch (error) {
+          console.warn('Failed to parse JSON field:', str, error);
           return defaultValue;
         }
       };
@@ -258,15 +277,20 @@ export const insightRoutes = new Elysia({ prefix: '/api/insights' })
         try {
           const values = parseCSVLine(dataLines[i]);
           
+          // Validate minimum required fields
+          if (values.length < 34) {
+            throw new Error(`Insufficient columns: expected 34, got ${values.length}`);
+          }
+
           // Parse the CSV row
           const insightData = {
             creationNumber: parseInt(values[1] || '1') || 1,
             subject: values[2] || '',
             insightId: values[3] || '',
             status: values[4] || '',
-            startDate: values[5] || null,
-            updateDate: values[6] || null,
-            endDate: values[7] || null,
+            startDate: values[5] === '' ? null : values[5],
+            updateDate: values[6] === '' ? null : values[6],
+            endDate: values[7] === '' ? null : values[7],
             type: values[8] || '',
             mainCategory: values[9] || '',
             subCategory: values[10] || '',
@@ -278,22 +302,30 @@ export const insightRoutes = new Elysia({ prefix: '/api/insights' })
             relatedInsight: values[16] || '',
             revenueCategory: values[17] || '',
             iconType: values[18] || '',
-            score: values[19] || '',
+            score: values[19] === '' ? null : values[19],
             relevancePolicy: values[20] || '',
             relevanceScore: values[21] || '',
-            displayCount: parseInt(values[22] || '1') || 1,
-            selectCount: parseInt(values[23] || '1') || 1,
+            displayCount: parseInt(values[22] || '0') || 0,
+            selectCount: parseInt(values[23] || '0') || 0,
             nextPolicy: values[24] || '',
             nextValue: values[25] || '',
             appLink: values[26] || '',
             externalLink: values[27] || '',
-            teaserImage: values[28] || null,
+            teaserImage: values[28] === '' ? null : values[28],
             storyImages: safeJSONParse(values[29] || '[]', []),
             maintenanceDate: values[30] || '2099-12-31',
             maintenanceReason: values[31] || '',
             remarks: values[32] || '',
             updatedBy: values[33] || '',
           };
+
+          // Basic validation
+          if (!insightData.subject.trim()) {
+            throw new Error('Subject is required');
+          }
+          if (!insightData.insightId.trim()) {
+            throw new Error('Insight ID is required');
+          }
 
           const result = await db.insert(insights).values(insightData).returning();
           imported.push(result[0]);
@@ -364,7 +396,17 @@ export const insightRoutes = new Elysia({ prefix: '/api/insights' })
       insight.updatedBy,
     ]);
 
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    // Properly escape CSV fields (wrap in quotes and escape internal quotes)
+    const escapeCSVField = (field: any): string => {
+      if (field === null || field === undefined) return '';
+      const str = String(field);
+      // Always wrap in quotes to avoid issues with commas, quotes, newlines, etc.
+      return '"' + str.replace(/"/g, '""') + '"';
+    };
+
+    const csv = [headers.map(escapeCSVField), ...rows.map(row => row.map(escapeCSVField))]
+      .map(row => row.join(','))
+      .join('\n');
     
     set.headers['Content-Type'] = 'text/csv; charset=utf-8';
     set.headers['Content-Disposition'] = 'attachment; filename=insights.csv';
